@@ -1,0 +1,14 @@
+roll,name,dept,status,special
+2520030103,Charan Kumar,CSE,ACTIVE,false
+2520030169,V Bharath Kumar,CSE,ACTIVE,true
+2520080101,Geetha Lakshmi,AI & DS,ACTIVE,false
+2520080102,Harish Rao,AI & DS,ACTIVE,false
+2520030102,Bhavana Singh,CSE,ACTIVE,false
+2520030366,Nimma Lokesh Reddy,CSE,ACTIVE,true
+2520030101,Aditya Verma,CSE,ACTIVE,false
+2520030333,Ramagiri Rishik Rao,CSE,ACTIVE,true
+2520040103,Farhan Ali,ECE,ACTIVE,false
+2520040102,Esha Patel,ECE,ACTIVE,false
+2520090101,Isha Kumari,CS & IT,ACTIVE,false
+2520090102,Jagadeesh Babu,CS & IT,ACTIVE,false
+2520040101,Deepak Reddy,ECE,ACTIVE,false

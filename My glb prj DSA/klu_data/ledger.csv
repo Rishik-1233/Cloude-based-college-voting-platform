@@ -1,0 +1,45 @@
+roll,category,candidateName,candidateId,timestamp
+2520030101,College Captain,Arjun Sharma,1,1772856302589
+2520030102,College Captain,Arjun Sharma,1,1772856302590
+2520030103,College Captain,Priya Reddy,2,1772856302590
+2520040101,College Captain,Arjun Sharma,1,1772856302590
+2520040102,College Captain,Priya Reddy,2,1772856302590
+2520040103,College Captain,Karthik Naidu,3,1772856302590
+2520080101,College Captain,Arjun Sharma,1,1772856302590
+2520080102,College Captain,Priya Reddy,2,1772856302590
+2520090101,College Captain,Karthik Naidu,3,1772856302590
+2520090102,College Captain,Arjun Sharma,1,1772856302590
+2520030101,Sports Captain,Ravi Kumar,4,1772856302590
+2520030102,Sports Captain,Sneha Patel,5,1772856302590
+2520030103,Sports Captain,Ravi Kumar,4,1772856302590
+2520040101,Sports Captain,Vikram Singh,6,1772856302590
+2520040102,Sports Captain,Sneha Patel,5,1772856302590
+2520040103,Sports Captain,Ravi Kumar,4,1772856302590
+2520080101,Sports Captain,Sneha Patel,5,1772856302590
+2520080102,Sports Captain,Vikram Singh,6,1772856302590
+2520090101,Sports Captain,Sneha Patel,5,1772856302590
+2520090102,Sports Captain,Ravi Kumar,4,1772856302590
+2520030101,Student Union Leader,Meera Iyer,7,1772856302590
+2520030102,Student Union Leader,Divya Rao,9,1772856302590
+2520030103,Student Union Leader,Meera Iyer,7,1772856302590
+2520040101,Student Union Leader,Suresh Babu,8,1772856302590
+2520040102,Student Union Leader,Meera Iyer,7,1772856302590
+2520040103,Student Union Leader,Divya Rao,9,1772856302590
+2520080101,Student Union Leader,Meera Iyer,7,1772856302590
+2520080102,Student Union Leader,Suresh Babu,8,1772856302590
+2520090101,Student Union Leader,Meera Iyer,7,1772856302590
+2520090102,Student Union Leader,Divya Rao,9,1772856302590
+2520030101,Club Leader,Ananya Krishnan,10,1772856302590
+2520030102,Club Leader,Rahul Menon,11,1772856302590
+2520030103,Club Leader,Ananya Krishnan,10,1772856302590
+2520040101,Club Leader,Lakshmi Devi,12,1772856302590
+2520040102,Club Leader,Rahul Menon,11,1772856302590
+2520040103,Club Leader,Ananya Krishnan,10,1772856302590
+2520080101,Club Leader,Rahul Menon,11,1772856302590
+2520080102,Club Leader,Lakshmi Devi,12,1772856302590
+2520090101,Club Leader,Rahul Menon,11,1772856302590
+2520090102,Club Leader,Ananya Krishnan,10,1772856302590
+2520030333,College Captain,Priya Reddy,2,1772856411559
+2520030333,Sports Captain,Vikram Singh,6,1772856415526
+2520030333,Student Union Leader,Suresh Babu,8,1772856424285
+2520030333,Club Leader,Rahul Menon,11,1772856429134
