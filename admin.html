@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>KLU Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#071e52;--blue:#1a56db;--sky:#3b82f6;--pale:#ebf3ff;
+  --grey:#f1f5fb;--border:#d0ddf0;--text:#0c1a3a;--muted:#6b7a99;
+  --green:#16a34a;--red:#dc2626;--orange:#ea580c;
+  --shadow-s:0 2px 10px rgba(7,30,82,.08);
+  --shadow-m:0 8px 30px rgba(7,30,82,.13);
+  --shadow-l:0 20px 60px rgba(7,30,82,.18);
+  --r:14px;--ease:.3s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--grey);color:var(--text);min-height:100vh}
+.hidden{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 20px;border:none;border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.87rem;font-weight:600;cursor:pointer;transition:var(--ease)}
+.btn-primary{background:linear-gradient(135deg,var(--blue),var(--navy));color:#fff;box-shadow:0 4px 14px rgba(26,86,219,.35)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-danger{background:linear-gradient(135deg,#ef4444,var(--red));color:#fff}
+.btn-success{background:linear-gradient(135deg,#22c55e,var(--green));color:#fff}
+.btn-warn{background:linear-gradient(135deg,#f59e0b,var(--orange));color:#fff}
+.btn-sm{padding:5px 12px;font-size:.76rem;border-radius:6px}
+
+#admin-nav{position:sticky;top:0;z-index:200;background:rgba(7,30,82,.97);backdrop-filter:blur(16px);display:flex;align-items:center;justify-content:space-between;padding:0 40px;height:64px;box-shadow:0 2px 16px rgba(7,30,82,.3)}
+.nav-brand{display:flex;align-items:center;gap:12px}
+.nav-brand img{height:40px;object-fit:contain}
+.nav-title{color:#fff;font-family:'Playfair Display',serif;font-size:.92rem;line-height:1.2}
+.nav-title small{display:block;font-family:'DM Sans',sans-serif;font-size:.66rem;opacity:.55;font-weight:400}
+.nav-right{display:flex;align-items:center;gap:10px}
+.admin-badge{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:50px;padding:4px 13px;font-size:.76rem;color:rgba(255,255,255,.85)}
+.btn-logout{background:rgba(220,38,38,.18);border:1px solid rgba(220,38,38,.35);border-radius:7px;padding:5px 14px;font-size:.8rem;color:#fca5a5;cursor:pointer;font-family:'DM Sans',sans-serif;transition:var(--ease)}
+.btn-logout:hover{background:rgba(220,38,38,.38)}
+
+.admin-hero{background:linear-gradient(150deg,#030f2e,var(--navy) 50%,#1a3fa0);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px}
+.admin-hero h1{font-family:'Playfair Display',serif;color:#fff;font-size:clamp(1.3rem,3vw,1.9rem)}
+.admin-hero p{color:rgba(255,255,255,.6);font-size:.86rem;margin-top:3px}
+.hero-stats{display:flex;gap:14px;flex-wrap:wrap}
+.hs{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.17);border-radius:10px;padding:11px 18px;text-align:center;min-width:82px}
+.hs-num{font-family:'Playfair Display',serif;font-size:1.7rem;color:#fff;line-height:1}
+.hs-lbl{font-size:.68rem;color:rgba(255,255,255,.55);margin-top:2px}
+
+.tab-bar{background:#fff;border-bottom:2px solid var(--border);display:flex;padding:0 40px;overflow-x:auto}
+.tab-btn{padding:13px 18px;border:none;background:none;font-family:'DM Sans',sans-serif;font-size:.86rem;font-weight:600;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;transition:var(--ease);white-space:nowrap;display:flex;align-items:center;gap:6px}
+.tab-btn:hover{color:var(--blue)}
+.tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+.content{max-width:1180px;margin:0 auto;padding:30px 20px}
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow-s);border:1.5px solid rgba(208,221,240,.5);margin-bottom:22px;overflow:hidden}
+.card-head{padding:16px 20px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.card-head h3{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--navy)}
+.card-body{padding:20px}
+
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.83rem}
+th{background:var(--grey);color:var(--navy);font-weight:700;text-align:left;padding:9px 13px;font-size:.76rem;text-transform:uppercase;letter-spacing:.3px}
+td{padding:10px 13px;border-bottom:1px solid var(--border);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafcff}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:50px;font-size:.71rem;font-weight:700}
+.badge-active{background:#f0fdf4;color:var(--green);border:1px solid #86efac}
+.badge-voted{background:#eff6ff;color:var(--blue);border:1px solid #bfdbfe}
+.badge-blocked{background:#fef2f2;color:var(--red);border:1px solid #fca5a5}
+.badge-dept{background:var(--pale);color:var(--blue);border:1px solid #bfdbfe}
+
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:13px;margin-bottom:16px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:.78rem;font-weight:600;color:var(--navy)}
+.fg input,.fg select{padding:9px 11px;border:2px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:.86rem;color:var(--text);background:var(--grey);outline:none;transition:var(--ease)}
+.fg input:focus,.fg select:focus{border-color:var(--sky);background:#fff;box-shadow:0 0 0 3px rgba(59,130,246,.1)}
+
+.results-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px}
+.rcat{background:#fff;border-radius:var(--r);box-shadow:var(--shadow-s);border:1.5px solid rgba(208,221,240,.5);overflow:hidden}
+.rcat-head{background:linear-gradient(90deg,var(--navy),var(--blue));padding:13px 16px;display:flex;align-items:center;gap:9px}
+.rcat-head h4{color:#fff;font-family:'Playfair Display',serif;font-size:.95rem}
+.rcat-body{padding:14px}
+.cr{display:flex;align-items:center;gap:9px;margin-bottom:11px}
+.cr:last-child{margin-bottom:0}
+.cr-av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--pale),var(--blue));display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;border:2px solid var(--blue)}
+.cr-info{flex:1;min-width:0}
+.cr-name{font-size:.82rem;font-weight:600;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cr-bar-wrap{height:7px;background:var(--grey);border-radius:50px;margin-top:3px}
+.cr-bar{height:7px;background:linear-gradient(90deg,var(--sky),var(--blue));border-radius:50px;transition:width .8s ease;min-width:3px}
+.cr-count{font-size:.8rem;font-weight:700;color:var(--blue);flex-shrink:0}
+.winner{display:inline-block;background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:50px;margin-left:4px;vertical-align:middle}
+
+.alert{border-radius:8px;padding:10px 13px;font-size:.83rem;display:flex;align-items:flex-start;gap:7px;margin-bottom:14px;line-height:1.5}
+.alert-error{background:#fef2f2;border:1.5px solid #fca5a5;color:var(--red)}
+.alert-success{background:#f0fdf4;border:1.5px solid #86efac;color:var(--green)}
+.alert-info{background:var(--pale);border:1.5px solid #bfdbfe;color:var(--blue)}
+
+.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.4)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:translateX(0)}}
+#admin-panel{animation:fadeIn .4s ease}
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;background:var(--navy);color:#fff;padding:11px 18px;border-radius:10px;font-size:.84rem;box-shadow:var(--shadow-l);display:flex;align-items:center;gap:8px;max-width:310px;animation:slideR .3s ease}
+.toast .tc{cursor:pointer;margin-left:auto;opacity:.6}
+.toast.t-ok{background:#15803d}.toast.t-err{background:var(--red)}.toast.t-warn{background:var(--orange)}
+
+@media(max-width:640px){
+  #admin-nav{padding:0 12px}.admin-hero{padding:20px 14px}.tab-bar{padding:0 8px}
+  .content{padding:18px 10px}.form-grid{grid-template-columns:1fr}.results-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="admin-panel">
+  <nav id="admin-nav">
+    <div class="nav-brand">
+      <img src="data:image/png;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAAQwAABtbnRyUkdCIFhZWiAH4AABAAEAAAAAAABhY3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAA9tYAAQAAAADTLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAlkZXNjAAAA8AAAACRyWFlaAAABFAAAABRnWFlaAAABKAAAABRiWFlaAAABPAAAABR3dHB0AAABUAAAABRyVFJDAAABZAAAAChnVFJDAAABZAAAAChiVFJDAAABZAAAAChjcHJ0AAABjAAAADxtbHVjAAAAAAAAAAEAAAAMZW5VUwAAAAgAAAAcAHMAUgBHAEJYWVogAAAAAAAAb6IAADj1AAADkFhZWiAAAAAAAABimQAAt4UAABjaWFlaIAAAAAAAACSgAAAPhAAAts9YWVogAAAAAAAA9tYAAQAAAADTLXBhcmEAAAAAAAQAAAACZmYAAPKnAAANWQAAE9AAAApbAAAAAAAAAABtbHVjAAAAAAAAAAEAAAAMZW5VUwAAACAAAAAcAEcAbwBvAGcAbABlACAASQBuAGMALgAgADIAMAAxADb/2wBDAAUDBAQEAwUEBAQFBQUGBwwIBwcHBw8LCwkMEQ8SEhEPERETFhwXExQaFRERGCEYGh0dHx8fExciJCIeJBweHx7/2wBDAQUFBQcGBw4ICA4eFBEUHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh4eHh7/wAARCAD5AU8DASIAAhEBAxEB/8QAHAABAAEFAQEAAAAAAAAAAAAAAAQBAgUGBwMI/8QAVBAAAQMCAwQFBA4GBgYLAAAAAQACAwQRBRIhBjFBUQcTImFxMoGRsQgUIzM1QlNzkqGywcLRFVJUcnTDNjdFYvDxFkZ1g4SzFyQ0Q2OChZOU0uH/xAAbAQEAAQUBAAAAAAAAAAAAAAAABgEDBAUHAv/EAD0RAAIBAgIGBQkGBgMAAAAAAAABAgMEBREGEiExQVETYXGhsTIzNVKBkdHh8BQVIjRywRYjJVOiskJDgv/aAAwDAQACEQMRAD8A+MkREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREAREQBERAEREARFOosNmqAJH+4xE2DnDf4DigIKqASbAXU6sw2aKoDIGumY4Xa4D1qdguHz085nnaGgNIAvrdCuRhC1w+KfQrVs9PJUS1NRFMAYg8BtiNxv8AcsPPhNbFciLO3mw3+pChARZKiwqSeFz5H9S4mzA4b/HkodXTTUsmSVtuRBuD4HigPFERASaKhq60vFLC6XIAXWtopH6ExX9jk9I/NZfYLy6zwZ+JbV5lrLm+nRqOCROcE0Vt8Rs43E5tN57suDyOe/oXFf2KX6lZU4XiFNC6aekkjjba7iNBddFWJ2uv+gZxfi37QXiliE5zUWltMrEdD7W1talaNSTcU3w4ew0NERbY54ERZ/Z/Z6Sry1NYHR0+9rdzn/kFbq1Y0o60mZthh9e/qqlQjm+5dbMTSUFbVsc+mppJWtNiWjS69v0Nin7DN6F0CGKKGJsUMbWRtFmtA0CvWqliks/wx2E9o6C0NRdJVetxyyyOefobFP2Gb0Kv6GxT9hl9C6Cdyqqfek/VRcegtqv+2Xd8Dnn6GxT9il9CuGCYsTpQy/Ut6q6mCljzzvy30a0C7nnkBxKisp6nEXZq68FN8WmadX/vn7grkcQm1m0kjEraIWkJdHTnKU+WzZ1t5bF3vgmc/cC1xad4NiqKXjLWsxera1rWtEzwGtFgBc6AKItrF5pMgFan0dSUOTa9wREVS2EREAREQBERAEREAREQBERAERTcKp4pXumqSBBGO1c2ueSAhDU2C2inZO/Doo5iGPyhpB10Hdzs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" alt="KLU"/>
+      <div class="nav-title">KLU Admin Panel<small>Voting Platform Management</small></div>
+    </div>
+    <div class="nav-right">
+      <span class="admin-badge">&#128274; Administrator</span>
+      <button class="btn-logout" onclick="adminLogout()">Logout</button>
+    </div>
+  </nav>
+
+  <div class="admin-hero">
+    <div>
+      <h1>&#127775; Admin Dashboard</h1>
+      <p>Manage voters, monitor elections, view live results</p>
+    </div>
+    <div class="hero-stats">
+      <div class="hs"><div class="hs-num" id="h-total">0</div><div class="hs-lbl">Total Voters</div></div>
+      <div class="hs"><div class="hs-num" id="h-voted">0</div><div class="hs-lbl">Voted</div></div>
+      <div class="hs"><div class="hs-num" id="h-pending">0</div><div class="hs-lbl">Pending</div></div>
+      <div class="hs"><div class="hs-num" id="h-blocked">0</div><div class="hs-lbl">Blocked</div></div>
+    </div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tab-voters" onclick="switchTab('voters')">&#128101; Voter Management</button>
+    <button class="tab-btn" id="tab-add" onclick="switchTab('add')">&#10133; Add Voter</button>
+    <button class="tab-btn" id="tab-results" onclick="switchTab('results')">
+      <span class="live-dot"></span>&nbsp;Live Results
+    </button>
+    <button class="tab-btn" id="tab-settings" onclick="switchTab('settings')">&#9881; Settings</button>
+  </div>
+
+  <div class="content">
+
+    <!-- VOTER MANAGEMENT -->
+    <div id="pane-voters">
+      <div class="card">
+        <div class="card-head">
+          <h3>&#128101; Registered Voters</h3>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input id="srch" type="text" placeholder="&#128269; Search name or roll..."
+              style="padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:.81rem;outline:none;width:200px"
+              oninput="renderTable()"/>
+            <select id="fdept" onchange="renderTable()"
+              style="padding:7px 11px;border:1.5px solid var(--border);border-radius:7px;font-size:.81rem;background:#fff;outline:none">
+              <option value="">All Depts</option>
+              <option>CSE</option><option>ECE</option><option>AI &amp; DS</option><option>CS &amp; IT</option>
+            </select>
+          </div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Roll</th><th>Name</th><th>Dept</th><th>Status</th><th>Votes</th><th>Actions</th></tr></thead>
+            <tbody id="vtbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD VOTER -->
+    <div id="pane-add" class="hidden">
+      <div class="card">
+        <div class="card-head"><h3>&#10133; Add New Voter</h3></div>
+        <div class="card-body">
+          <div id="add-alert" class="alert hidden"></div>
+          <div class="form-grid">
+            <div class="fg">
+              <label>Roll Number *</label>
+              <input id="nroll" type="text" maxlength="10" placeholder="e.g. 2520030400" oninput="autoDetect()"/>
+              <span style="font-size:.7rem;color:var(--muted);margin-top:2px">25200+(30/40/80/90)+3 digits</span>
+            </div>
+            <div class="fg">
+              <label>Full Name *</label>
+              <input id="nname" type="text" placeholder="Student full name"/>
+            </div>
+            <div class="fg">
+              <label>Department</label>
+              <select id="ndept">
+                <option value="">Auto-detect</option>
+                <option>CSE</option><option>ECE</option><option>AI &amp; DS</option><option>CS &amp; IT</option>
+              </select>
+            </div>
+            <div class="fg">
+              <label>Access</label>
+              <select id="naccess">
+                <option value="active">Active (Can Vote)</option>
+                <option value="blocked">Blocked</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="addVoter()">&#10003; Add Voter</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><h3>&#128196; Bulk Import (CSV)</h3></div>
+        <div class="card-body">
+          <p style="font-size:.81rem;color:var(--muted);margin-bottom:12px">One voter per line: <code>ROLL,NAME</code></p>
+          <textarea id="bulk-txt" rows="6"
+            style="width:100%;padding:11px;border:2px solid var(--border);border-radius:8px;font-size:.81rem;font-family:'DM Sans',sans-serif;outline:none;resize:vertical"
+            placeholder="2520030100,Student One&#10;2520040200,Student Two"></textarea>
+          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-success" onclick="bulkImport()">&#128196; Import</button>
+            <button class="btn btn-warn" onclick="document.getElementById('bulk-txt').value=''">&#10005; Clear</button>
+          </div>
+          <div id="bulk-res" style="margin-top:10px;font-size:.81rem;color:var(--muted)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LIVE RESULTS -->
+    <div id="pane-results" class="hidden">
+      <div style="display:flex;align-items:center;gap:9px;margin-bottom:18px">
+        <span class="live-dot"></span>
+        <span style="font-size:.85rem;color:var(--muted)">Live results from localStorage</span>
+        <button class="btn btn-sm btn-primary" onclick="renderResults()" style="margin-left:auto">&#8635; Refresh</button>
+      </div>
+      <div class="results-grid" id="rgrid"></div>
+      <div class="card" style="margin-top:22px">
+        <div class="card-head"><h3>&#128202; Voter Participation</h3></div>
+        <div class="card-body" id="part-list"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div id="pane-settings" class="hidden">
+      <div class="card">
+        <div class="card-head"><h3>&#9881; Election Settings</h3></div>
+        <div class="card-body">
+          <div class="alert alert-info">&#8505; These actions affect all voters. Use carefully.</div>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-top:8px">
+            <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:18px">
+              <h4 style="font-size:.88rem;color:var(--navy);margin-bottom:7px">&#128260; Reset All Votes</h4>
+              <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Clears all votes so students can vote again.</p>
+              <button class="btn btn-warn" onclick="resetAllVotes()">Reset All Votes</button>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:18px">
+              <h4 style="font-size:.88rem;color:var(--navy);margin-bottom:7px">&#128683; Block All Voters</h4>
+              <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Prevents all students from logging in.</p>
+              <button class="btn btn-danger" onclick="setAllAccess('blocked')">Block Everyone</button>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:18px">
+              <h4 style="font-size:.88rem;color:var(--navy);margin-bottom:7px">&#9989; Activate All</h4>
+              <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Re-enables all voters to log in.</p>
+              <button class="btn btn-success" onclick="setAllAccess('active')">Activate Everyone</button>
+            </div>
+            <div style="border:1.5px solid var(--border);border-radius:var(--r);padding:18px">
+              <h4 style="font-size:.88rem;color:var(--red);margin-bottom:7px">&#128465; Clear All Voters</h4>
+              <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px">Deletes entire voter database permanently.</p>
+              <button class="btn btn-danger" onclick="clearAllVoters()">Delete All Voters</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-head"><h3>&#128202; Export Data</h3></div>
+        <div class="card-body" style="display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="exportVoters()">&#128196; Export Voters (CSV)</button>
+          <button class="btn btn-primary" onclick="exportResults()">&#128196; Export Results (CSV)</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toasts"></div>
+
+<script>
+var ROLL_RE = /^25200(30|40|80|90)\d{3}$/;
+var DEPT_MAP = {"30":"CSE","40":"ECE","80":"AI & DS","90":"CS & IT"};
+var CATS = ["college-captain","sports-captain","union-leader","club-leader"];
+var CAT_LABELS = {"college-captain":"College Captain","sports-captain":"Sports Captain","union-leader":"Student Union Leader","club-leader":"Club Leader"};
+var CAT_ICONS  = {"college-captain":"&#127891;","sports-captain":"&#127942;","union-leader":"&#128505;","club-leader":"&#127912;"};
+var CANDIDATES = {
+  "college-captain":[{n:"Arjun Sharma",e:"&#128104;"},{n:"Priya Reddy",e:"&#128105;"},{n:"Karthik Naidu",e:"&#128104;"}],
+  "sports-captain":[{n:"Ravi Kumar",e:"&#9917;"},{n:"Sneha Patel",e:"&#127992;"},{n:"Vikram Singh",e:"&#127939;"}],
+  "union-leader":[{n:"Meera Iyer",e:"&#129309;"},{n:"Suresh Babu",e:"&#128226;"},{n:"Divya Rao",e:"&#11088;"}],
+  "club-leader":[{n:"Ananya Krishnan",e:"&#127917;"},{n:"Rahul Menon",e:"&#128187;"},{n:"Lakshmi Devi",e:"&#127925;"}]
+};
+
+function getVoters(){try{return JSON.parse(localStorage.getItem("klu_admin_voters"))||[];}catch(e){return [];}}
+function saveVoters(a){localStorage.setItem("klu_admin_voters",JSON.stringify(a));}
+function getVotes(r){try{return JSON.parse(localStorage.getItem("kv_"+r))||{};}catch(e){return {};}}
+function clearVotes(r){localStorage.removeItem("kv_"+r);}
+
+function seedVoters(){
+  if(localStorage.getItem("klu_admin_voters")) return;
+  saveVoters([
+    {roll:"2520030333",name:"Ramagiri Rishik Rao",dept:"CSE",access:"active"},
+    {roll:"2520030366",name:"Nimma Lokesh Reddy",dept:"CSE",access:"active"},
+    {roll:"2520030169",name:"V Bharath Kumar",dept:"CSE",access:"active"}
+  ]);
+}
+
+/* Auto-seed and render on load */
+seedVoters();
+renderAll();
+
+function adminLogout(){
+  sessionStorage.removeItem("klu_admin_ok");
+  window.location.href = "index.html";
+}
+
+function switchTab(name){
+  ["voters","add","results","settings"].forEach(function(t){
+    document.getElementById("pane-"+t).classList.add("hidden");
+    document.getElementById("tab-"+t).classList.remove("active");
+  });
+  document.getElementById("pane-"+name).classList.remove("hidden");
+  document.getElementById("tab-"+name).classList.add("active");
+  if(name==="results") renderResults();
+  if(name==="voters") renderTable();
+}
+
+function renderAll(){renderTable();updateStats();}
+
+function updateStats(){
+  var v=getVoters();
+  var voted=v.filter(function(x){return Object.keys(getVotes(x.roll)).length===4;}).length;
+  var blocked=v.filter(function(x){return x.access==="blocked";}).length;
+  document.getElementById("h-total").textContent=v.length;
+  document.getElementById("h-voted").textContent=voted;
+  document.getElementById("h-pending").textContent=v.length-voted-blocked;
+  document.getElementById("h-blocked").textContent=blocked;
+}
+
+function renderTable(){
+  var voters=getVoters();
+  var srch=document.getElementById("srch").value.toLowerCase();
+  var dept=document.getElementById("fdept").value;
+  var tbody=document.getElementById("vtbody");
+  tbody.innerHTML="";
+  var filtered=voters.filter(function(v){
+    return (!srch||(v.roll.includes(srch)||v.name.toLowerCase().includes(srch)))&&(!dept||v.dept===dept);
+  });
+  if(!filtered.length){
+    tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:26px">No voters found</td></tr>';
+    updateStats(); return;
+  }
+  filtered.forEach(function(v,i){
+    var vc=Object.keys(getVotes(v.roll)).length;
+    var st=v.access==="blocked"?"blocked":(vc===4?"voted":"active");
+    var stLbl={active:"Active",voted:"Fully Voted",blocked:"Blocked"}[st];
+    var tr=document.createElement("tr");
+    tr.innerHTML=
+      '<td style="color:var(--muted);font-size:.76rem">'+(i+1)+'</td>'+
+      '<td><code style="background:var(--grey);padding:2px 6px;border-radius:4px;font-size:.78rem">'+v.roll+'</code></td>'+
+      '<td style="font-weight:600">'+v.name+'</td>'+
+      '<td><span class="badge badge-dept">'+v.dept+'</span></td>'+
+      '<td><span class="badge badge-'+st+'">'+stLbl+'</span></td>'+
+      '<td><b style="color:var(--navy)">'+vc+'</b><span style="color:var(--muted);font-size:.73rem">/4</span></td>'+
+      '<td><div style="display:flex;gap:4px;flex-wrap:wrap">'+
+        (v.access==="blocked"
+          ? '<button class="btn btn-sm btn-success" onclick="toggleAccess(\''+v.roll+'\')">&#9989; Unblock</button>'
+          : '<button class="btn btn-sm btn-warn" onclick="toggleAccess(\''+v.roll+'\')">&#128683; Block</button>')+
+        '<button class="btn btn-sm btn-primary" onclick="resetVoter(\''+v.roll+'\')">&#128260;</button>'+
+        '<button class="btn btn-sm btn-danger" onclick="deleteVoter(\''+v.roll+'\')">&#128465;</button>'+
+      '</div></td>';
+    tbody.appendChild(tr);
+  });
+  updateStats();
+}
+
+function toggleAccess(roll){
+  var voters=getVoters(), v=voters.find(function(x){return x.roll===roll;});
+  if(!v) return;
+  v.access=v.access==="blocked"?"active":"blocked";
+  saveVoters(voters); renderTable();
+  toast(v.access==="active"?v.name+" unblocked":v.name+" blocked", v.access==="active"?"t-ok":"t-warn");
+}
+
+function resetVoter(roll){
+  if(!confirm("Reset all votes for "+roll+"?")) return;
+  clearVotes(roll); renderTable(); toast("Votes reset for "+roll,"t-ok");
+}
+
+function deleteVoter(roll){
+  var voters=getVoters(), v=voters.find(function(x){return x.roll===roll;});
+  if(!v||!confirm("Delete voter "+v.name+"?")) return;
+  saveVoters(voters.filter(function(x){return x.roll!==roll;}));
+  renderTable(); toast("Voter deleted","t-warn");
+}
+
+function autoDetect(){
+  var roll=document.getElementById("nroll").value;
+  if(roll.length>=7){var d=DEPT_MAP[roll.substring(5,7)];if(d) document.getElementById("ndept").value=d;}
+}
+
+function addVoter(){
+  var roll=document.getElementById("nroll").value.trim();
+  var name=document.getElementById("nname").value.trim();
+  var dept=document.getElementById("ndept").value;
+  var access=document.getElementById("naccess").value;
+  var al=document.getElementById("add-alert");
+  al.className="alert hidden";
+  if(!ROLL_RE.test(roll)){al.className="alert alert-error";al.innerHTML="&#9888; Invalid roll number format.";return;}
+  if(!name){al.className="alert alert-error";al.innerHTML="&#9888; Name is required.";return;}
+  var voters=getVoters();
+  if(voters.find(function(x){return x.roll===roll;})){al.className="alert alert-error";al.innerHTML="&#9888; Roll number already exists.";return;}
+  if(!dept) dept=DEPT_MAP[roll.substring(5,7)]||"KLU";
+  voters.push({roll:roll,name:name,dept:dept,access:access});
+  saveVoters(voters);
+  al.className="alert alert-success";
+  al.innerHTML="&#10003; Voter <b>"+name+"</b> added!";
+  document.getElementById("nroll").value="";
+  document.getElementById("nname").value="";
+  document.getElementById("ndept").value="";
+  renderTable(); toast("Voter added: "+name,"t-ok");
+}
+
+function bulkImport(){
+  var text=document.getElementById("bulk-txt").value.trim();
+  if(!text){toast("Nothing to import","t-warn");return;}
+  var lines=text.split("\n"), voters=getVoters(), added=0, skipped=0, errors=0;
+  lines.forEach(function(line){
+    line=line.trim(); if(!line) return;
+    var parts=line.split(",");
+    if(parts.length<2){errors++;return;}
+    var roll=parts[0].trim(), name=parts.slice(1).join(",").trim();
+    if(!ROLL_RE.test(roll)){errors++;return;}
+    if(voters.find(function(x){return x.roll===roll;})){skipped++;return;}
+    voters.push({roll:roll,name:name,dept:DEPT_MAP[roll.substring(5,7)]||"KLU",access:"active"});
+    added++;
+  });
+  saveVoters(voters);
+  document.getElementById("bulk-res").innerHTML="Added: <b>"+added+"</b> &nbsp;|&nbsp; Duplicates: <b>"+skipped+"</b> &nbsp;|&nbsp; Errors: <b>"+errors+"</b>";
+  renderTable(); if(added>0) toast(added+" voters imported","t-ok");
+}
+
+function renderResults(){
+  var voters=getVoters(), grid=document.getElementById("rgrid");
+  grid.innerHTML="";
+  CATS.forEach(function(cat){
+    var cands=CANDIDATES[cat], counts=[0,0,0], total=0;
+    voters.forEach(function(v){
+      var votes=getVotes(v.roll);
+      if(votes[cat]){var idx=(votes[cat].n||1)-1;if(idx>=0&&idx<3){counts[idx]++;total++;}}
+    });
+    var maxC=Math.max(counts[0],counts[1],counts[2]);
+    var div=document.createElement("div"); div.className="rcat";
+    var html='<div class="rcat-head"><span style="font-size:1.2rem">'+CAT_ICONS[cat]+'</span><h4>'+CAT_LABELS[cat]+'</h4><span style="margin-left:auto;color:rgba(255,255,255,.6);font-size:.75rem">'+total+' votes</span></div><div class="rcat-body">';
+    cands.forEach(function(c,i){
+      var pct=total>0?Math.round(counts[i]/total*100):0;
+      var isWin=total>0&&counts[i]===maxC&&counts[i]>0;
+      html+='<div class="cr">'+
+        '<div class="cr-av">'+c.e+'</div>'+
+        '<div class="cr-info">'+
+          '<div class="cr-name">'+c.n+(isWin?'<span class="winner">&#127942; Leading</span>':'')+'</div>'+
+          '<div class="cr-bar-wrap"><div class="cr-bar" style="width:'+pct+'%"></div></div>'+
+        '</div>'+
+        '<div class="cr-count">'+counts[i]+'<span style="font-size:.62rem;opacity:.6"> ('+pct+'%)</span></div>'+
+      '</div>';
+    });
+    html+='</div>';
+    div.innerHTML=html; grid.appendChild(div);
+  });
+  var partDiv=document.getElementById("part-list");
+  if(!voters.length){partDiv.innerHTML='<p style="color:var(--muted);font-size:.83rem">No voters registered yet.</p>';return;}
+  var tbl='<div class="tbl-wrap"><table><thead><tr><th>Roll</th><th>Name</th><th>Dept</th><th>College</th><th>Sports</th><th>Union</th><th>Club</th><th>Total</th></tr></thead><tbody>';
+  voters.forEach(function(v){
+    var votes=getVotes(v.roll);
+    var row='<tr><td><code style="font-size:.73rem;background:var(--grey);padding:1px 5px;border-radius:3px">'+v.roll+'</code></td><td style="font-weight:600">'+v.name+'</td><td>'+v.dept+'</td>';
+    CATS.forEach(function(cat){
+      if(votes[cat]){var c=CANDIDATES[cat][(votes[cat].n||1)-1];row+='<td style="color:var(--green);font-size:.76rem">&#10003; '+(c?c.n:"?")+'</td>';}
+      else{row+='<td style="color:var(--muted);font-size:.76rem">&#8212;</td>';}
+    });
+    row+='<td><b style="color:var(--navy)">'+Object.keys(votes).length+'</b>/4</td></tr>';
+    tbl+=row;
+  });
+  tbl+='</tbody></table></div>';
+  partDiv.innerHTML=tbl;
+}
+
+function resetAllVotes(){
+  if(!confirm("Reset ALL votes? Cannot be undone!")) return;
+  getVoters().forEach(function(v){clearVotes(v.roll);});
+  renderAll(); toast("All votes reset","t-warn");
+}
+
+function setAllAccess(status){
+  if(!confirm("Set ALL voters to "+status+"?")) return;
+  var voters=getVoters(); voters.forEach(function(v){v.access=status;}); saveVoters(voters);
+  renderTable(); toast(status==="blocked"?"All voters blocked":"All voters activated", status==="blocked"?"t-warn":"t-ok");
+}
+
+function clearAllVoters(){
+  if(!confirm("DELETE ALL VOTERS permanently?")) return;
+  if(!confirm("Are you absolutely sure?")) return;
+  localStorage.removeItem("klu_admin_voters"); renderAll(); toast("All voters deleted","t-err");
+}
+
+function exportVoters(){
+  var voters=getVoters(), csv="Roll Number,Name,Department,Access,Votes Cast\n";
+  voters.forEach(function(v){csv+=v.roll+","+v.name+","+v.dept+","+v.access+","+Object.keys(getVotes(v.roll)).length+"\n";});
+  dlCSV(csv,"klu_voters.csv");
+}
+
+function exportResults(){
+  var voters=getVoters(), csv="Roll,Name,College Captain,Sports Captain,Union Leader,Club Leader\n";
+  voters.forEach(function(v){
+    var votes=getVotes(v.roll), row=[v.roll,v.name];
+    CATS.forEach(function(cat){
+      if(votes[cat]){var c=CANDIDATES[cat][(votes[cat].n||1)-1];row.push(c?c.n:"Unknown");}
+      else{row.push("Not voted");}
+    });
+    csv+=row.join(",")+"\n";
+  });
+  dlCSV(csv,"klu_results.csv");
+}
+
+function dlCSV(content,filename){
+  var a=document.createElement("a");
+  a.href="data:text/csv;charset=utf-8,"+encodeURIComponent(content);
+  a.download=filename; a.click();
+}
+
+function toast(msg,cls,ms){
+  ms=ms||3600;
+  var box=document.getElementById("toasts"), el=document.createElement("div");
+  el.className="toast "+(cls||"");
+  el.innerHTML='<span>'+msg+'</span><span class="tc" onclick="this.parentElement.remove()">&#10005;</span>';
+  box.appendChild(el);
+  setTimeout(function(){if(el.parentNode)el.remove();},ms);
+}
+</script>
+</body>
+</html>
